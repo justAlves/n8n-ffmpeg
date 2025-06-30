@@ -1,0 +1,30 @@
+services:
+  n8n:
+    # Em vez de 'image', você usaria 'build' se estivesse rodando com docker-compose localmente
+    # build:
+    #   context: . # Ponto para a pasta onde o Dockerfile está
+    #   dockerfile: Dockerfile # Nome do arquivo Dockerfile
+    # No Coolify, você configura isso na interface, apontando para o Git repo
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SERVICE_FQDN_N8N_5678
+      - 'N8N_EDITOR_BASE_URL=${SERVICE_FQDN_N8N}'
+      - 'WEBHOOK_URL=${SERVICE_FQDN_N8N}'
+      - 'N8N_HOST=${SERVICE_URL_N8N}'
+      - 'GENERIC_TIMEZONE=${GENERIC_TIMEZONE:-Europe/Berlin}'
+      - 'TZ=${TZ:-Europe/Berlin}'
+      - 'N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE}'
+    volumes:
+      # Mantenha o volume para não perder seus dados!
+      - n8n-data:/home/node/.n8n
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'wget -qO- http://127.0.0.1:5678/'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+volumes:
+  n8n-data:
