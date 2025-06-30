@@ -1,9 +1,15 @@
-# Usa a imagem oficial do n8n como base
+# Use the official n8n image from n8n.io as the base
 FROM docker.n8n.io/n8nio/n8n
 
-# Instala o FFmpeg e suas dependências
-# Usamos apt-get porque a imagem oficial do n8n é baseada em Debian/Ubuntu
-RUN apk add --no-cache ffmpeg
+# Switch to root to install packages
+USER root
 
-# Mantém o comando padrão para iniciar o n8n
-CMD ["n8n"]
+# Install Docker CLI and ffmpeg
+RUN apk add --no-cache docker-cli ffmpeg
+
+# Create the docker group if it does not exist and add the 'node' user to it
+RUN addgroup -S docker || true
+RUN addgroup node docker
+
+# Switch back to the default user 'node'
+USER node
